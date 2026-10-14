@@ -99,3 +99,14 @@ The frontend uses ethers.js from a CDN, so an internet connection is required.
 
 Developed as an academic blockchain DApp project.
 
+## Application Screenshots
+
+### 1. Home Page
+![BlockProof Home Page](Home%20page.png)
+
+### 2. Document Registration and Verification
+![Register and Verify Document](Register%20and%20verify%20Page.png)
+
+### 3. How BlockProof Works
+![How BlockProof Works](How%20it%20works%20page.png)
+
