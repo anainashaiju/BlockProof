@@ -1,0 +1,48 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract DocumentVerifier {
+
+    struct Document {
+        string name;
+        string documentHash;
+        address registeredBy;
+        uint256 timestamp;
+    }
+
+    mapping(string => Document) private documents;
+
+    function registerDocument(
+        string memory _name,
+        string memory _documentHash
+    ) public {
+        documents[_documentHash] = Document(
+            _name,
+            _documentHash,
+            msg.sender,
+            block.timestamp
+        );
+    }
+
+    function verifyDocument(
+        string memory _documentHash
+    ) public view returns (
+        bool,
+        string memory,
+        address,
+        uint256
+    ) {
+        Document memory doc = documents[_documentHash];
+
+        if (bytes(doc.documentHash).length == 0) {
+            return (false, "", address(0), 0);
+        }
+
+        return (
+            true,
+            doc.name,
+            doc.registeredBy,
+            doc.timestamp
+        );
+    }
+}
