@@ -57,6 +57,18 @@ Registers a document name and its SHA-256 hash on the blockchain, together with 
 
 Checks whether the supplied hash has a registered record and returns the verification status and associated details.
 
+## Smart Contract Deployment
+
+1. Open [Remix IDE](https://remix.ethereum.org/).
+2. Create a Solidity file named `DocumentVerifier.sol` and paste the smart contract code from this repository.
+3. Compile the contract using a compatible Solidity compiler version (`0.8.20` or later).
+4. Open the **Deploy & Run Transactions** panel.
+5. Connect Remix to MetaMask using the **Injected Provider** option.
+6. Select the Ethereum Sepolia test network in MetaMask.
+7. Select `DocumentVerifier` and click **Deploy**.
+8. Confirm the deployment transaction in MetaMask.
+9. After deployment, copy the deployed contract address and use it in the frontend configuration.
+
 ## How to Run the Project
 
 ### Prerequisites
