@@ -1,0 +1,2586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BlockProof | Document Authenticity</title>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Inter, Arial, sans-serif;
+    background: #f5f9ff;
+    color: #12233f;
+    line-height: 1.5;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+:root {
+    --navy: #0d2545;
+    --blue: #1677ff;
+    --cyan: #28c4f4;
+    --green: #16b875;
+    --purple: #7057e8;
+    --muted: #61738f;
+    --border: #dce8f5;
+    --card: #ffffff;
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar {
+    background: linear-gradient(110deg, #0b2140, #12345d);
+    color: #fff;
+    min-height: 76px;
+    padding: 0 5.5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    box-shadow: 0 8px 28px rgba(10, 38, 73, .14);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: #fff;
+}
+
+.logo {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    background: linear-gradient(145deg, #28c4f4, #1475ff);
+    box-shadow: 0 8px 20px rgba(23, 130, 255, .25);
+}
+
+.logo svg {
+    width: 27px;
+    height: 27px;
+}
+
+.brand-name {
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -.7px;
+}
+
+.brand-name span {
+    color: #32c8f7;
+}
+
+.navlinks {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.navlinks a {
+    color: #dce9f7;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.navlinks a:hover {
+    color: #55d5ff;
+}
+
+.network-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #e8f2ff;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #19c889;
+    box-shadow: 0 0 0 4px rgba(25, 200, 137, .13);
+}
+
+.connect {
+    border: 0;
+    border-radius: 11px;
+    padding: 11px 16px;
+    color: #fff;
+    background: linear-gradient(135deg, #1677ff, #3158e8);
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(31, 103, 244, .22);
+}
+
+.connect.connected {
+    background: #16b875;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+    max-width: 1260px;
+    margin: 0 auto;
+    padding: 68px 42px 52px;
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    align-items: center;
+    gap: 45px;
+}
+
+.eyebrow {
+    color: #6486ad;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+
+.hero h1 {
+    font-size: 58px;
+    line-height: 1.03;
+    letter-spacing: -2.6px;
+    color: #102b50;
+    margin-bottom: 13px;
+}
+
+.hero h1 span {
+    color: #1677ff;
+}
+
+.hero h2 {
+    font-size: 24px;
+    margin-bottom: 14px;
+    color: #16365f;
+}
+
+.hero p {
+    max-width: 650px;
+    color: #5e728f;
+    font-size: 16px;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 27px;
+    flex-wrap: wrap;
+}
+
+.primary,
+.secondary {
+    border: 0;
+    border-radius: 12px;
+    padding: 13px 20px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    text-decoration: none;
+}
+
+.primary {
+    background: #1677ff;
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(22, 119, 255, .23);
+}
+
+.secondary {
+    background: #fff;
+    color: #17477d;
+    border: 1px solid var(--border);
+}
+
+/* =========================
+   HERO GRAPHIC
+========================= */
+
+.hero-art {
+    min-height: 355px;
+    position: relative;
+    display: grid;
+    place-items: center;
+}
+
+.art-glow {
+    position: absolute;
+    width: 330px;
+    height: 330px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(48, 192, 255, .22),
+        rgba(48, 192, 255, 0) 70%
+    );
+}
+
+.document-art {
+    width: min(100%, 480px);
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 25px 30px rgba(29, 92, 155, .16));
+}
+
+.feature {
+    position: absolute;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 13px 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    box-shadow: 0 15px 30px rgba(27, 72, 119, .12);
+    z-index: 2;
+}
+
+.feature strong {
+    display: block;
+    font-size: 13px;
+    color: #16365f;
+}
+
+.feature small {
+    display: block;
+    color: #71839b;
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.feature.one {
+    right: 0;
+    top: 42px;
+}
+
+.feature.two {
+    left: 0;
+    bottom: 48px;
+}
+
+.feature-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: #e8f8f1;
+    color: #0da66a;
+}
+
+/* =========================
+   MAIN AREA
+========================= */
+
+.shell {
+    max-width: 1260px;
+    margin: 0 auto;
+    padding: 0 42px 60px;
+}
+
+/* =========================
+   WALLET STATUS
+========================= */
+
+.status {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    padding: 17px 20px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    box-shadow: 0 10px 30px rgba(25, 69, 112, .07);
+    margin-bottom: 25px;
+}
+
+.status-label {
+    font-size: 13px;
+    color: #71839b;
+}
+
+.wallet {
+    font-size: 14px;
+    font-weight: 800;
+    color: #153963;
+}
+
+.status-message {
+    margin-left: auto;
+    font-size: 13px;
+    color: #0d9a63;
+    font-weight: 700;
+}
+
+/* =========================
+   WORKSPACE
+========================= */
+
+.workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 300px;
+    gap: 22px;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 19px;
+    padding: 25px;
+    box-shadow: 0 12px 32px rgba(26, 71, 114, .07);
+}
+
+.card-head {
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    margin-bottom: 22px;
+}
+
+.card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    display: grid;
+    place-items: center;
+    flex: none;
+}
+
+.card-icon.blue {
+    background: #e8f1ff;
+    color: #2676ee;
+}
+
+.card-icon.green {
+    background: #e6f9f1;
+    color: #0ba56b;
+}
+
+.card h3 {
+    font-size: 20px;
+    color: #14345d;
+}
+
+.card-head p {
+    font-size: 12px;
+    color: #71839b;
+    margin-top: 3px;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.label {
+    font-size: 12px;
+    font-weight: 800;
+    color: #1c3d65;
+    margin-bottom: 8px;
+    display: block;
+}
+
+input[type=text],
+.file-box {
+    width: 100%;
+    border: 1px solid #cfdeed;
+    background: #fbfdff;
+    border-radius: 11px;
+    padding: 12px 13px;
+    outline: none;
+    transition: .2s;
+}
+
+input[type=text]:focus,
+.file-box:focus-within {
+    border-color: #5a9aff;
+    box-shadow: 0 0 0 4px rgba(50, 126, 255, .1);
+}
+
+.field {
+    margin-bottom: 14px;
+}
+
+.file-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    margin-bottom: 14px;
+}
+
+.file-box input[type=file] {
+    width: 100%;
+    font-size: 12px;
+    color: #536b87;
+}
+
+.file-box input[type=file]::file-selector-button {
+    border: 0;
+    background: #eaf2ff;
+    color: #1854a0;
+    border-radius: 8px;
+    padding: 8px 11px;
+    font-weight: 700;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+/* =========================
+   HASH DISPLAY
+========================= */
+
+.hash-box {
+    display: none;
+    background: #f0f6ff;
+    border: 1px dashed #bcd3ef;
+    border-radius: 11px;
+    padding: 11px 12px;
+    margin: 12px 0 16px;
+}
+
+.hash-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: #416488;
+    margin-bottom: 5px;
+}
+
+.hash-value {
+    font-family: Consolas, monospace;
+    font-size: 10px;
+    line-height: 1.55;
+    word-break: break-all;
+    color: #1a4c7c;
+}
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+
+.action {
+    width: 100%;
+    border: 0;
+    border-radius: 11px;
+    padding: 13px;
+    color: #fff;
+    font-weight: 800;
+    transition: .2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.action:hover {
+    transform: translateY(-1px);
+}
+
+.action.register {
+    background: linear-gradient(135deg, #1978ff, #2861e8);
+}
+
+.action.verify {
+    background: linear-gradient(135deg, #16b979, #0aa467);
+}
+
+/* =========================
+   INFO BOX
+========================= */
+
+.info-box {
+    margin-top: 16px;
+    border-radius: 12px;
+    padding: 12px 13px;
+    background: #f3f8ff;
+    color: #58718e;
+    font-size: 11px;
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+}
+
+.info-box svg {
+    flex: none;
+    margin-top: 1px;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.side {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.side-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 21px;
+}
+
+.side-card.network {
+    background: linear-gradient(145deg, #eaf5ff, #f8fbff);
+}
+
+.side-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 800;
+    color: #17385f;
+}
+
+.side-title svg {
+    color: #1878ff;
+}
+
+.online {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #0ca46a;
+    font-size: 12px;
+    font-weight: 800;
+    margin: 13px 0 17px;
+}
+
+.network-row {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #dce9f5;
+    padding: 10px 0 0;
+    margin-top: 10px;
+    font-size: 11px;
+}
+
+.network-row span:first-child {
+    color: #6b819a;
+}
+
+.network-row span:last-child {
+    color: #17385f;
+    font-weight: 700;
+}
+
+.security {
+    background: linear-gradient(145deg, #eafaf4, #f8fffc);
+}
+
+.security .side-title {
+    color: #0b9b65;
+}
+
+.security p {
+    font-size: 12px;
+    color: #607890;
+    margin-top: 9px;
+}
+
+/* =========================
+   RESULT
+========================= */
+
+.result {
+    display: none;
+    margin-top: 16px;
+    padding: 15px;
+    border-radius: 13px;
+    font-size: 12px;
+    line-height: 1.65;
+    border: 1px solid transparent;
+}
+
+.result.success {
+    background: #ecfbf5;
+    border-color: #bcebd7;
+    color: #0b7952;
+}
+
+.result.fail {
+    background: #fff1f1;
+    border-color: #f2c7c7;
+    color: #a02828;
+}
+
+.result .mono {
+    font-family: Consolas, monospace;
+    word-break: break-all;
+    font-size: 10px;
+}
+
+/* =========================
+   MESSAGE
+========================= */
+
+.message {
+    display: none;
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    border-radius: 11px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.message.ok {
+    display: block;
+    background: #e8faf2;
+    color: #087b50;
+    border: 1px solid #bfead7;
+}
+
+.message.err {
+    display: block;
+    background: #fff0f0;
+    color: #a02727;
+    border: 1px solid #f0c7c7;
+}
+
+/* =========================
+   HOW IT WORKS
+========================= */
+
+.steps {
+    max-width: 1260px;
+    margin: 0 auto;
+    padding: 10px 42px 58px;
+}
+
+.steps h2 {
+    text-align: center;
+    font-size: 27px;
+    color: #16365f;
+    margin-bottom: 8px;
+}
+
+.steps-sub {
+    text-align: center;
+    color: #71839b;
+    font-size: 13px;
+    margin-bottom: 25px;
+}
+
+.step-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.step {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    padding: 21px;
+}
+
+.step-num {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: #eaf2ff;
+    color: #1872ec;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 13px;
+    margin-bottom: 13px;
+}
+
+.step h3 {
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.step p {
+    font-size: 12px;
+    color: #6b8098;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+    background: #0d2545;
+    color: #dbe8f5;
+    padding: 25px 5.5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    font-size: 12px;
+}
+
+.footer-brand {
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.footer-brand span {
+    color: #2cc7f7;
+}
+
+footer .tagline {
+    color: #d2e1f0;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1050px) {
+
+    .workspace {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .side {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .hero {
+        grid-template-columns: 1fr;
+        padding-top: 48px;
+    }
+
+    .hero-art {
+        min-height: 300px;
+    }
+
+    .navlinks {
+        display: none;
+    }
+}
+
+@media (max-width: 720px) {
+
+    .hero,
+    .shell,
+    .steps {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .hero h1 {
+        font-size: 43px;
+    }
+
+    .hero h2 {
+        font-size: 20px;
+    }
+
+    .workspace,
+    .step-grid,
+    .side {
+        grid-template-columns: 1fr;
+    }
+
+    .side {
+        grid-column: auto;
+    }
+
+    .status {
+        flex-wrap: wrap;
+    }
+
+    .status-message {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .navbar {
+        padding: 0 20px;
+    }
+
+    .connect {
+        padding: 9px 12px;
+        font-size: 12px;
+    }
+
+    footer {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .feature.one {
+        right: -5px;
+    }
+
+    .feature.two {
+        left: -5px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     NAVIGATION
+========================= -->
+
+<header class="navbar">
+
+    <a class="brand" href="#">
+
+        <div class="logo">
+
+            <svg viewBox="0 0 32 32" fill="none">
+
+                <path
+                    d="M16 3l10 4v7c0 7-4.2 12.1-10 15-5.8-2.9-10-8-10-15V7l10-4z"
+                    stroke="white"
+                    stroke-width="2.2"
+                />
+
+                <path
+                    d="M10.5 16l3.4 3.4 7.7-8"
+                    stroke="white"
+                    stroke-width="2.4"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                />
+
+            </svg>
+
+        </div>
+
+        <div class="brand-name">
+            Block<span>Proof</span>
+        </div>
+
+    </a>
+
+    <nav class="navlinks">
+
+        <a href="#">Home</a>
+        <a href="#register">Register</a>
+        <a href="#verify">Verify</a>
+        <a href="#how">How It Works</a>
+
+    </nav>
+
+    <div style="display:flex;align-items:center;gap:14px">
+
+        <div class="network-pill">
+            <span class="dot"></span>
+            Sepolia
+        </div>
+
+        <button class="connect" id="connectBtn">
+            Connect MetaMask
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- =========================
+     HERO SECTION
+========================= -->
+
+<section class="hero">
+
+    <div>
+
+        <div class="eyebrow">
+            Secure • Transparent • Decentralized
+        </div>
+
+        <h1>
+            Your Document.<br>
+            <span>Your Proof.</span>
+        </h1>
+
+        <h2>
+            Blockchain-based document authenticity verification
+        </h2>
+
+        <p>
+            BlockProof generates a unique SHA-256 fingerprint for your
+            document and stores that fingerprint on the Ethereum Sepolia
+            blockchain. Verify the document later without uploading the
+            document itself.
+        </p>
+
+        <div class="hero-actions">
+
+            <a class="primary" href="#register">
+                Get Started →
+            </a>
+
+            <a class="secondary" href="#how">
+                Learn How It Works
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- HERO ILLUSTRATION -->
+
+    <div class="hero-art">
+
+        <div class="art-glow"></div>
+
+        <svg class="document-art" viewBox="0 0 520 390" fill="none">
+
+            <defs>
+
+                <linearGradient
+                    id="paper"
+                    x1="100"
+                    y1="60"
+                    x2="370"
+                    y2="330"
+                    gradientUnits="userSpaceOnUse"
+                >
+                    <stop stop-color="#ffffff"/>
+                    <stop offset="1" stop-color="#eaf4ff"/>
+                </linearGradient>
+
+                <linearGradient
+                    id="cube"
+                    x1="0"
+                    y1="0"
+                    x2="1"
+                    y2="1"
+                >
+                    <stop stop-color="#27c8f7"/>
+                    <stop offset="1" stop-color="#2270f4"/>
+                </linearGradient>
+
+            </defs>
+
+
+            <!-- DOCUMENT -->
+
+            <path
+                d="M115 72h177l75 75v181H115V72z"
+                fill="url(#paper)"
+                stroke="#b9d4ef"
+                stroke-width="3"
+            />
+
+            <path
+                d="M292 72v77h75"
+                stroke="#b9d4ef"
+                stroke-width="3"
+            />
+
+            <path
+                d="M153 173h144M153 204h130M153 235h113"
+                stroke="#83a8d0"
+                stroke-width="10"
+                stroke-linecap="round"
+                opacity=".55"
+            />
+
+
+            <!-- CHECK MARK -->
+
+            <circle
+                cx="276"
+                cy="286"
+                r="52"
+                fill="#e4f7f1"
+                stroke="#42c99b"
+                stroke-width="3"
+            />
+
+            <path
+                d="M249 286l18 18 38-40"
+                stroke="#10a971"
+                stroke-width="11"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            />
+
+
+            <!-- BLOCKCHAIN CUBES -->
+
+            <g opacity=".95">
+
+                <path
+                    d="M65 104l35-20 35 20-35 20-35-20z"
+                    fill="url(#cube)"
+                />
+
+                <path
+                    d="M65 104v39l35 20v-39l-35-20z"
+                    fill="#2389f7"
+                />
+
+                <path
+                    d="M135 104v39l-35 20v-39l35-20z"
+                    fill="#39c6f4"
+                />
+
+
+                <path
+                    d="M377 62l31-18 31 18-31 18-31-18z"
+                    fill="url(#cube)"
+                />
+
+                <path
+                    d="M377 62v34l31 18V80l-31-18z"
+                    fill="#2389f7"
+                />
+
+                <path
+                    d="M439 62v34l-31 18V80l31-18z"
+                    fill="#39c6f4"
+                />
+
+
+                <path
+                    d="M385 277l28-16 28 16-28 16-28-16z"
+                    fill="url(#cube)"
+                />
+
+                <path
+                    d="M385 277v31l28 16v-31l-28-16z"
+                    fill="#2389f7"
+                />
+
+                <path
+                    d="M441 277v31l-28 16v-31l28-16z"
+                    fill="#39c6f4"
+                />
+
+            </g>
+
+
+            <!-- CONNECTION LINES -->
+
+            <g stroke="#8ac9f4" stroke-width="2" opacity=".8">
+
+                <path d="M135 124l38 30"/>
+
+                <path d="M377 88l-40 49"/>
+
+                <path d="M385 286l-47-11"/>
+
+            </g>
+
+        </svg>
+
+
+        <!-- FEATURE CARD -->
+
+        <div class="feature one">
+
+            <div class="feature-icon">
+
+                <svg
+                    width="21"
+                    height="21"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+
+                    <path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6l7-3z"/>
+
+                    <path d="M8.5 12l2.2 2.2 4.8-5"/>
+
+                </svg>
+
+            </div>
+
+            <div>
+
+                <strong>Tamper Proof</strong>
+
+                <small>
+                    Any content change is detected.
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- FEATURE CARD -->
+
+        <div class="feature two">
+
+            <div
+                class="feature-icon"
+                style="background:#edf2ff;color:#426ce5"
+            >
+
+                <svg
+                    width="21"
+                    height="21"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+
+                    <circle cx="12" cy="5" r="2"/>
+                    <circle cx="5" cy="18" r="2"/>
+                    <circle cx="19" cy="18" r="2"/>
+
+                    <path d="M12 7v5"/>
+                    <path d="M10.5 12.8L6.8 16"/>
+                    <path d="M13.5 12.8l3.7 3.2"/>
+
+                </svg>
+
+            </div>
+
+            <div>
+
+                <strong>Decentralized</strong>
+
+                <small>
+                    Proof stored on blockchain.
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<div class="shell">
+
+    <!-- WALLET STATUS -->
+
+    <div class="status">
+
+        <span class="status-label">
+            WALLET STATUS
+        </span>
+
+        <span class="wallet" id="walletStatus">
+            Not Connected
+        </span>
+
+        <span class="status-message" id="statusText">
+            Connect MetaMask to begin
+        </span>
+
+    </div>
+
+
+    <div id="message" class="message"></div>
+
+
+    <!-- =========================
+         WORKSPACE
+    ========================= -->
+
+    <section class="workspace">
+
+
+        <!-- =========================
+             REGISTER
+        ========================= -->
+
+        <div class="card" id="register">
+
+            <div class="card-head">
+
+                <div class="card-icon blue">
+
+                    <svg
+                        width="25"
+                        height="25"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+
+                        <path d="M14 2v6h6"/>
+
+                        <path d="M12 11v6"/>
+
+                        <path d="M9 14h6"/>
+
+                    </svg>
+
+                </div>
+
+                <div>
+
+                    <h3>
+                        Register Document
+                    </h3>
+
+                    <p>
+                        Add a document fingerprint to the blockchain.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- DOCUMENT NAME -->
+
+            <div class="field">
+
+                <label class="label">
+                    Document Name
+                </label>
+
+                <input
+                    type="text"
+                    id="documentName"
+                    placeholder="Example: Degree Certificate"
+                >
+
+            </div>
+
+
+            <!-- FILE -->
+
+            <div class="field">
+
+                <label class="label">
+                    Select Document
+                </label>
+
+                <div class="file-box">
+
+                    <input
+                        type="file"
+                        id="registerFile"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- HASH -->
+
+            <div
+                class="hash-box"
+                id="registerHashBox"
+            >
+
+                <div class="hash-title">
+                    GENERATED SHA-256 HASH
+                </div>
+
+                <div
+                    class="hash-value"
+                    id="registerHash"
+                ></div>
+
+            </div>
+
+
+            <!-- REGISTER BUTTON -->
+
+            <button
+                class="action register"
+                id="registerBtn"
+            >
+
+                <span>
+                    Register Document
+                </span>
+
+            </button>
+
+
+            <!-- INFO -->
+
+            <div class="info-box">
+
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#2476e9"
+                    stroke-width="2"
+                >
+
+                    <circle cx="12" cy="12" r="9"/>
+
+                    <path d="M12 10v6"/>
+
+                    <path d="M12 7h.01"/>
+
+                </svg>
+
+                <span>
+                    Only the SHA-256 fingerprint is stored on-chain.
+                    Your actual document stays on your device.
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             VERIFY
+        ========================= -->
+
+        <div class="card" id="verify">
+
+            <div class="card-head">
+
+                <div class="card-icon green">
+
+                    <svg
+                        width="25"
+                        height="25"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+
+                        <path
+                            d="M12 3l8 4v5c0 5-3.5 8.7-8 10-4.5-1.3-8-5-8-10V7l8-4z"
+                        />
+
+                        <path
+                            d="M8.5 12l2.2 2.2 4.8-5"
+                        />
+
+                    </svg>
+
+                </div>
+
+                <div>
+
+                    <h3>
+                        Verify Document
+                    </h3>
+
+                    <p>
+                        Check whether a document was previously registered.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- FILE -->
+
+            <div class="field">
+
+                <label class="label">
+                    Select Document
+                </label>
+
+                <div class="file-box">
+
+                    <input
+                        type="file"
+                        id="verifyFile"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- HASH -->
+
+            <div
+                class="hash-box"
+                id="verifyHashBox"
+            >
+
+                <div class="hash-title">
+                    GENERATED SHA-256 HASH
+                </div>
+
+                <div
+                    class="hash-value"
+                    id="verifyHash"
+                ></div>
+
+            </div>
+
+
+            <!-- VERIFY BUTTON -->
+
+            <button
+                class="action verify"
+                id="verifyBtn"
+            >
+
+                <span>
+                    Verify Document
+                </span>
+
+            </button>
+
+
+            <!-- RESULT -->
+
+            <div
+                id="result"
+                class="result"
+            ></div>
+
+
+            <!-- INFO -->
+
+            <div class="info-box">
+
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#2476e9"
+                    stroke-width="2"
+                >
+
+                    <circle cx="12" cy="12" r="9"/>
+
+                    <path d="M12 10v6"/>
+
+                    <path d="M12 7h.01"/>
+
+                </svg>
+
+                <span>
+                    The system recalculates the hash and compares it
+                    with the blockchain record.
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             SIDEBAR
+        ========================= -->
+
+        <aside class="side">
+
+
+            <!-- NETWORK -->
+
+            <div class="side-card network">
+
+                <div class="side-title">
+
+                    <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+
+                        <circle cx="12" cy="5" r="2"/>
+                        <circle cx="5" cy="18" r="2"/>
+                        <circle cx="19" cy="18" r="2"/>
+
+                        <path d="M12 7v5"/>
+                        <path d="M10.5 12.8L6.8 16"/>
+                        <path d="M13.5 12.8l3.7 3.2"/>
+
+                    </svg>
+
+                    Blockchain Network
+
+                </div>
+
+
+                <div class="online">
+
+                    <span class="dot"></span>
+
+                    Connected to Sepolia Testnet
+
+                </div>
+
+
+                <div class="network-row">
+
+                    <span>
+                        Network
+                    </span>
+
+                    <span>
+                        Ethereum Sepolia
+                    </span>
+
+                </div>
+
+
+                <div class="network-row">
+
+                    <span>
+                        Wallet
+                    </span>
+
+                    <span>
+                        MetaMask
+                    </span>
+
+                </div>
+
+
+                <div class="network-row">
+
+                    <span>
+                        Web3
+                    </span>
+
+                    <span>
+                        ethers.js 6
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- SECURITY -->
+
+            <div class="side-card security">
+
+                <div class="side-title">
+
+                    <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+
+                        <path
+                            d="M12 3l8 4v5c0 5-3.5 8.7-8 10-4.5-1.3-8-5-8-10V7l8-4z"
+                        />
+
+                        <path
+                            d="M8.5 12l2.2 2.2 4.8-5"
+                        />
+
+                    </svg>
+
+                    Secure Your Documents
+
+                </div>
+
+
+                <p>
+                    BlockProof protects document authenticity by using
+                    cryptographic hashing and blockchain verification.
+                </p>
+
+            </div>
+
+
+            <!-- SMART CONTRACT -->
+
+            <div class="side-card">
+
+                <div class="side-title">
+
+                    <svg
+                        width="23"
+                        height="23"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#7358e8"
+                        stroke-width="1.8"
+                    >
+
+                        <path d="M12 2v20"/>
+                        <path d="M5 6h14"/>
+                        <path d="M5 18h14"/>
+                        <path d="M7 6l-2 12"/>
+                        <path d="M17 6l2 12"/>
+
+                    </svg>
+
+                    Smart Contract
+
+                </div>
+
+
+                <p
+                    style="
+                    font-size:10px;
+                    color:#6a8099;
+                    margin-top:9px;
+                    word-break:break-all;
+                    font-family:Consolas,monospace;
+                    "
+                >
+                    0xc107709b9c59B14640EB77070e1D4E55e9495ea7
+                </p>
+
+            </div>
+
+        </aside>
+
+    </section>
+
+</div>
+
+
+<!-- =========================
+     HOW IT WORKS
+========================= -->
+
+<section
+    class="steps"
+    id="how"
+>
+
+    <h2>
+        How BlockProof Works
+    </h2>
+
+    <p class="steps-sub">
+        A simple three-step process for document authenticity.
+    </p>
+
+
+    <div class="step-grid">
+
+
+        <div class="step">
+
+            <div class="step-num">
+                01
+            </div>
+
+            <h3>
+                Generate Fingerprint
+            </h3>
+
+            <p>
+                BlockProof calculates a unique SHA-256 hash
+                from the selected document.
+            </p>
+
+        </div>
+
+
+        <div class="step">
+
+            <div class="step-num">
+                02
+            </div>
+
+            <h3>
+                Register on Blockchain
+            </h3>
+
+            <p>
+                The document name and fingerprint are recorded
+                through the smart contract.
+            </p>
+
+        </div>
+
+
+        <div class="step">
+
+            <div class="step-num">
+                03
+            </div>
+
+            <h3>
+                Verify Authenticity
+            </h3>
+
+            <p>
+                The document is hashed again and compared
+                with the blockchain record.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer>
+
+    <div class="footer-brand">
+        Block<span>Proof</span>
+    </div>
+
+    <div class="tagline">
+        Blockchain for a Safer Tomorrow
+    </div>
+
+    <div>
+        © 2026 • Ethereum Sepolia
+    </div>
+
+</footer>
+
+
+<!-- =========================
+     JAVASCRIPT
+========================= -->
+
+<script>
+
+/* =========================
+   CONTRACT INFORMATION
+========================= */
+
+const contractAddress =
+    "0xc107709b9c59B14640EB77070e1D4E55e9495ea7";
+
+
+const contractABI = [
+
+    "function registerDocument(string memory _name, string memory _documentHash) public",
+
+    "function verifyDocument(string memory _documentHash) public view returns (bool, string memory, address, uint256)"
+
+];
+
+
+/* =========================
+   SEPOLIA
+========================= */
+
+const SEPOLIA_CHAIN_ID = 11155111n;
+
+const SEPOLIA_CHAIN_ID_HEX = "0xaa36a7";
+
+
+/* =========================
+   VARIABLES
+========================= */
+
+let provider;
+
+let signer;
+
+let contract;
+
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const connectBtn =
+    document.getElementById("connectBtn");
+
+const walletStatus =
+    document.getElementById("walletStatus");
+
+const statusText =
+    document.getElementById("statusText");
+
+const message =
+    document.getElementById("message");
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+function showMessage(text, success = true) {
+
+    message.textContent = text;
+
+    message.className =
+        "message " + (success ? "ok" : "err");
+
+}
+
+
+/* =========================
+   SHA-256 HASH
+========================= */
+
+async function calculateFileHash(file) {
+
+    const buffer =
+        await file.arrayBuffer();
+
+    const hashBuffer =
+        await crypto.subtle.digest(
+            "SHA-256",
+            buffer
+        );
+
+    return Array
+        .from(new Uint8Array(hashBuffer))
+        .map(
+            byte =>
+                byte.toString(16).padStart(2, "0")
+        )
+        .join("");
+
+}
+
+
+/* =========================
+   SHOW HASH
+========================= */
+
+function showHash(
+    boxId,
+    valueId,
+    hash
+) {
+
+    document.getElementById(boxId)
+        .style.display = "block";
+
+    document.getElementById(valueId)
+        .textContent = hash;
+
+}
+
+
+/* =========================
+   CONNECT METAMASK
+========================= */
+
+connectBtn.addEventListener(
+    "click",
+    async () => {
+
+        if (!window.ethereum) {
+
+            alert(
+                "MetaMask is not installed. Please install MetaMask."
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            await window.ethereum.request({
+                method: "eth_requestAccounts"
+            });
+
+
+            /* Switch to Sepolia */
+
+            try {
+
+                await window.ethereum.request({
+
+                    method:
+                        "wallet_switchEthereumChain",
+
+                    params: [
+                        {
+                            chainId:
+                                SEPOLIA_CHAIN_ID_HEX
+                        }
+                    ]
+
+                });
+
+            } catch (e) {
+
+                alert(
+                    "Please switch MetaMask to the Sepolia Test Network."
+                );
+
+                return;
+
+            }
+
+
+            /* Provider */
+
+            provider =
+                new ethers.BrowserProvider(
+                    window.ethereum
+                );
+
+
+            /* Check network */
+
+            const network =
+                await provider.getNetwork();
+
+
+            if (
+                network.chainId !==
+                SEPOLIA_CHAIN_ID
+            ) {
+
+                alert(
+                    "Wrong network detected. Please use Sepolia."
+                );
+
+                return;
+
+            }
+
+
+            /* Signer */
+
+            signer =
+                await provider.getSigner();
+
+
+            /* Address */
+
+            const address =
+                await signer.getAddress();
+
+
+            /* Contract */
+
+            contract =
+                new ethers.Contract(
+                    contractAddress,
+                    contractABI,
+                    signer
+                );
+
+
+            /* UI */
+
+            walletStatus.textContent =
+                address.substring(0, 6) +
+                "..." +
+                address.substring(
+                    address.length - 4
+                );
+
+
+            connectBtn.textContent =
+                "Wallet Connected";
+
+
+            connectBtn.classList.add(
+                "connected"
+            );
+
+
+            statusText.textContent =
+                "Connected to Sepolia successfully";
+
+
+            showMessage(
+                "Wallet connected successfully.",
+                true
+            );
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Wallet connection failed."
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================
+   REGISTER FILE
+========================= */
+
+document
+    .getElementById("registerFile")
+    .addEventListener(
+        "change",
+        async (event) => {
+
+            const file =
+                event.target.files[0];
+
+            if (!file)
+                return;
+
+
+            try {
+
+                const hash =
+                    await calculateFileHash(
+                        file
+                    );
+
+
+                showHash(
+                    "registerHashBox",
+                    "registerHash",
+                    hash
+                );
+
+
+                /* Automatically use filename
+                   if name field is empty */
+
+                const nameInput =
+                    document.getElementById(
+                        "documentName"
+                    );
+
+
+                if (!nameInput.value.trim()) {
+
+                    nameInput.value =
+                        file.name;
+
+                }
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    "Could not calculate the document hash."
+                );
+
+            }
+
+        }
+    );
+
+
+/* =========================
+   VERIFY FILE
+========================= */
+
+document
+    .getElementById("verifyFile")
+    .addEventListener(
+        "change",
+        async (event) => {
+
+            const file =
+                event.target.files[0];
+
+            if (!file)
+                return;
+
+
+            try {
+
+                const hash =
+                    await calculateFileHash(
+                        file
+                    );
+
+
+                showHash(
+                    "verifyHashBox",
+                    "verifyHash",
+                    hash
+                );
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    "Could not calculate the document hash."
+                );
+
+            }
+
+        }
+    );
+
+
+/* =========================
+   REGISTER DOCUMENT
+========================= */
+
+document
+    .getElementById("registerBtn")
+    .addEventListener(
+        "click",
+        async () => {
+
+            /* Check wallet */
+
+            if (!contract) {
+
+                alert(
+                    "Please connect MetaMask first."
+                );
+
+                return;
+
+            }
+
+
+            /* Get values */
+
+            const name =
+                document
+                    .getElementById(
+                        "documentName"
+                    )
+                    .value
+                    .trim();
+
+
+            const file =
+                document
+                    .getElementById(
+                        "registerFile"
+                    )
+                    .files[0];
+
+
+            /* Validation */
+
+            if (!name || !file) {
+
+                alert(
+                    "Please enter a document name and select a document."
+                );
+
+                return;
+
+            }
+
+
+            try {
+
+                /* Check network */
+
+                const network =
+                    await provider.getNetwork();
+
+
+                if (
+                    network.chainId !==
+                    SEPOLIA_CHAIN_ID
+                ) {
+
+                    alert(
+                        "Please connect to Sepolia."
+                    );
+
+                    return;
+
+                }
+
+
+                /* Calculate hash */
+
+                const hash =
+                    await calculateFileHash(
+                        file
+                    );
+
+
+                showHash(
+                    "registerHashBox",
+                    "registerHash",
+                    hash
+                );
+
+
+                showMessage(
+                    "Please confirm the transaction in MetaMask...",
+                    true
+                );
+
+
+                /* Smart contract call */
+
+                const transaction =
+                    await contract.registerDocument(
+                        name,
+                        hash
+                    );
+
+
+                showMessage(
+                    "Transaction submitted. Waiting for blockchain confirmation...",
+                    true
+                );
+
+
+                /* Wait for blockchain */
+
+                await transaction.wait();
+
+
+                /* Success */
+
+                showMessage(
+                    "Document registered successfully on Sepolia!",
+                    true
+                );
+
+
+                alert(
+                    "Document registered successfully!"
+                );
+
+
+            } catch (error) {
+
+                console.error(error);
+
+
+                showMessage(
+                    "Registration failed. Check MetaMask and make sure you are on Sepolia.",
+                    false
+                );
+
+
+                alert(
+                    "Registration failed."
+                );
+
+            }
+
+        }
+    );
+
+
+/* =========================
+   VERIFY DOCUMENT
+========================= */
+
+document
+    .getElementById("verifyBtn")
+    .addEventListener(
+        "click",
+        async () => {
+
+            /* Check wallet */
+
+            if (!contract) {
+
+                alert(
+                    "Please connect MetaMask first."
+                );
+
+                return;
+
+            }
+
+
+            /* Get file */
+
+            const file =
+                document
+                    .getElementById(
+                        "verifyFile"
+                    )
+                    .files[0];
+
+
+            const resultBox =
+                document.getElementById(
+                    "result"
+                );
+
+
+            /* Validation */
+
+            if (!file) {
+
+                alert(
+                    "Please select a document to verify."
+                );
+
+                return;
+
+            }
+
+
+            try {
+
+                /* Check network */
+
+                const network =
+                    await provider.getNetwork();
+
+
+                if (
+                    network.chainId !==
+                    SEPOLIA_CHAIN_ID
+                ) {
+
+                    alert(
+                        "Please connect to Sepolia."
+                    );
+
+                    return;
+
+                }
+
+
+                /* Generate hash */
+
+                const hash =
+                    await calculateFileHash(
+                        file
+                    );
+
+
+                showHash(
+                    "verifyHashBox",
+                    "verifyHash",
+                    hash
+                );
+
+
+                /* Smart contract */
+
+                const result =
+                    await contract.verifyDocument(
+                        hash
+                    );
+
+
+                const exists =
+                    result[0];
+
+
+                resultBox.style.display =
+                    "block";
+
+
+                /* =====================
+                   VERIFIED
+                ===================== */
+
+                if (exists) {
+
+                    const name =
+                        result[1];
+
+                    const registeredBy =
+                        result[2];
+
+                    const timestamp =
+                        result[3];
+
+
+                    const date =
+                        new Date(
+                            Number(timestamp) *
+                            1000
+                        );
+
+
+                    resultBox.className =
+                        "result success";
+
+
+                    resultBox.innerHTML = `
+
+                        <strong>
+                            ✓ Document Verified
+                        </strong>
+
+                        <br><br>
+
+                        <strong>
+                            Document:
+                        </strong>
+
+                        ${name}
+
+                        <br>
+
+                        <strong>
+                            Registered By:
+                        </strong>
+
+                        ${registeredBy}
+
+                        <br>
+
+                        <strong>
+                            Registered On:
+                        </strong>
+
+                        ${date.toLocaleString()}
+
+                        <br><br>
+
+                        <strong>
+                            SHA-256:
+                        </strong>
+
+                        <br>
+
+                        <span class="mono">
+                            ${hash}
+                        </span>
+
+                    `;
+
+
+                }
+
+                /* =====================
+                   NOT FOUND
+                ===================== */
+
+                else {
+
+                    resultBox.className =
+                        "result fail";
+
+
+                    resultBox.innerHTML = `
+
+                        <strong>
+                            ✗ Document Not Found
+                        </strong>
+
+                        <br><br>
+
+                        This document fingerprint
+                        was not found on the blockchain.
+
+                        <br><br>
+
+                        <strong>
+                            SHA-256:
+                        </strong>
+
+                        <br>
+
+                        <span class="mono">
+                            ${hash}
+                        </span>
+
+                    `;
+
+                }
+
+
+            } catch (error) {
+
+                console.error(error);
+
+
+                resultBox.style.display =
+                    "block";
+
+
+                resultBox.className =
+                    "result fail";
+
+
+                resultBox.innerHTML = `
+
+                    <strong>
+                        Verification failed.
+                    </strong>
+
+                    <br>
+
+                    Please check MetaMask
+                    and the Sepolia network.
+
+                `;
+
+            }
+
+        }
+    );
+
+
+/* =========================
+   METAMASK EVENTS
+========================= */
+
+if (window.ethereum) {
+
+    window.ethereum.on(
+        "accountsChanged",
+        () => location.reload()
+    );
+
+
+    window.ethereum.on(
+        "chainChanged",
+        () => location.reload()
+    );
+
+}
+
+</script>
+
+</body>
+</html>
